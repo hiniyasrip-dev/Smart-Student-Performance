@@ -291,6 +291,26 @@ Smart-Student-Performance/
 
 ---
 
+## 📊 Project Visualizations
+
+### Model Comparison
+
+This chart compares the R² performance of the four evaluated regression models.
+
+![Model Comparison](visualizations/model_comparison.png)
+
+### Feature Importance
+
+The Random Forest model shows the relative importance of each feature in predicting student performance.
+
+![Feature Importance](visualizations/feature_importance.png)
+
+### Actual vs Predicted Scores
+
+This visualization compares the actual student scores with the scores predicted by the final Random Forest model.
+
+![Actual vs Predicted](visualizations/actual_vs_predicted.png)
+
 ## 🛠️ Technologies Used
 
 * Python
