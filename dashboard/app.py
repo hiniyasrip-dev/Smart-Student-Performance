@@ -1,0 +1,210 @@
+import streamlit as st
+import sys
+from pathlib import Path
+
+
+# ============================================================
+# PROJECT SETUP
+# ============================================================
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(PROJECT_ROOT))
+
+from src.predict import predict_student_performance
+
+
+# ============================================================
+# PAGE CONFIGURATION
+# ============================================================
+
+st.set_page_config(
+    page_title="Student Performance Predictor",
+    page_icon="🎓",
+    layout="wide"
+)
+
+
+# ============================================================
+# HEADER
+# ============================================================
+
+st.title("🎓 Smart Student Performance Predictor")
+
+st.markdown(
+    """
+    Predict a student's **total performance score** using academic
+    engagement indicators and a trained **Random Forest Regression model**.
+    """
+)
+
+st.divider()
+
+
+# ============================================================
+# SIDEBAR
+# ============================================================
+
+with st.sidebar:
+
+    st.header("📌 Model Information")
+
+    st.metric(
+        label="Model",
+        value="Random Forest"
+    )
+
+    st.metric(
+        label="R² Score",
+        value="0.709"
+    )
+
+    st.metric(
+        label="MAE",
+        value="6.19"
+    )
+
+    st.metric(
+        label="RMSE",
+        value="8.44"
+    )
+
+    st.divider()
+
+    st.caption(
+        "Metrics shown above are based on the held-out test dataset."
+    )
+
+
+# ============================================================
+# INPUT SECTION
+# ============================================================
+
+st.subheader("📝 Student Information")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    weekly_self_study_hours = st.number_input(
+        "📚 Weekly Self-Study Hours",
+        min_value=0.0,
+        max_value=100.0,
+        value=15.0,
+        step=0.5
+    )
+
+with col2:
+    attendance_percentage = st.number_input(
+        "📅 Attendance Percentage",
+        min_value=0.0,
+        max_value=100.0,
+        value=85.0,
+        step=1.0
+    )
+
+with col3:
+    class_participation = st.number_input(
+        "🙋 Class Participation",
+        min_value=0.0,
+        max_value=100.0,
+        value=5.0,
+        step=1.0
+    )
+
+
+st.divider()
+
+
+# ============================================================
+# PREDICTION
+# ============================================================
+
+if st.button(
+    "🚀 Predict Student Performance",
+    type="primary",
+    use_container_width=True
+):
+
+    predicted_score = predict_student_performance(
+        weekly_self_study_hours,
+        attendance_percentage,
+        class_participation
+    )
+
+    st.subheader("📊 Prediction Result")
+
+    result_col1, result_col2 = st.columns(2)
+
+    with result_col1:
+        st.metric(
+            label="Predicted Total Score",
+            value=f"{predicted_score:.2f}"
+        )
+
+    with result_col2:
+        st.metric(
+            label="Study Hours / Week",
+            value=f"{weekly_self_study_hours:.1f}"
+        )
+
+    # --------------------------------------------------------
+    # Performance interpretation
+    # --------------------------------------------------------
+
+    if predicted_score >= 80:
+        performance_message = "High predicted performance range."
+    elif predicted_score >= 60:
+        performance_message = "Moderate predicted performance range."
+    else:
+        performance_message = "Lower predicted performance range."
+
+    st.success(f"🎯 {performance_message}")
+
+    # --------------------------------------------------------
+    # Input summary
+    # --------------------------------------------------------
+
+    st.subheader("📋 Student Input Summary")
+
+    summary_col1, summary_col2, summary_col3 = st.columns(3)
+
+    with summary_col1:
+        st.write("**Self-Study Hours**")
+        st.write(f"{weekly_self_study_hours:.1f} hours/week")
+
+    with summary_col2:
+        st.write("**Attendance**")
+        st.write(f"{attendance_percentage:.1f}%")
+
+    with summary_col3:
+        st.write("**Class Participation**")
+        st.write(f"{class_participation:.1f}")
+
+
+# ============================================================
+# ABOUT THE MODEL
+# ============================================================
+
+st.divider()
+
+st.subheader("ℹ️ About This Model")
+
+st.markdown(
+    """
+    This system uses a **Random Forest Regression model** trained on
+    student academic engagement data.
+
+    **Input features:**
+    - Weekly self-study hours
+    - Attendance percentage
+    - Class participation
+
+    The system also generates engineered features during prediction:
+
+    - Study × Attendance interaction
+    - Engagement score
+
+    **Important:** The predicted score is an estimate generated by the
+    trained model. It should not be interpreted as a guaranteed academic
+    result or as evidence that one factor causes another.
+    """
+)
